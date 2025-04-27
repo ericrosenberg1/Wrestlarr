@@ -1,85 +1,97 @@
-# <img width="24px" src="./Logo/256.png" alt="Sonarr"></img> Sonarr
+# <img width="24px" src="./logo.png" alt="Wrestlarr"></img> Wrestlarr
 
-[![Translated](https://translate.servarr.com/widget/servarr/sonarr/svg-badge.svg)](https://translate.servarr.com/engage/servarr/)
-[![Backers on Open Collective](https://opencollective.com/Sonarr/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/Sonarr/sponsors/badge.svg)](#sponsors)
-[![Mega Sponsors on Open Collective](https://opencollective.com/Sonarr/megasponsors/badge.svg)](#mega-sponsors)
+[![Build Status](https://github.com/<org>/Wrestlarr/actions/workflows/ci.yml/badge.svg)](https://github.com/<org>/Wrestlarr/actions)
+[![Coverage Status](https://coveralls.io/repos/github/<org>/Wrestlarr/badge.svg?branch=main)](https://coveralls.io/github/<org>/Wrestlarr?branch=main)
+[![Docker Pulls](https://img.shields.io/docker/pulls/<org>/wrestlarr.svg)](https://hub.docker.com/r/<org>/wrestlarr)
+[![License](https://img.shields.io/github/license/<org>/Wrestlarr.svg)](LICENSE)
+[![Backers on Open Collective](https://opencollective.com/Wrestlarr/backers/badge.svg)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/Wrestlarr/sponsors/badge.svg)](#sponsors)
 
-Sonarr is a PVR for Usenet and BitTorrent users. It can monitor multiple RSS feeds for new episodes of your favorite shows and will grab, sort and rename them. It can also be configured to automatically upgrade the quality of files already downloaded when a better quality format becomes available.
+Wrestlarr is a personal video recorder (PVR) tailored for professional wrestling content. It monitors multiple feeds for new events and episodes, downloads and organizes files, and upgrades quality when better formats become available.
 
 ## Getting Started
 
-- [Download/Installation](https://sonarr.tv/#downloads-v3)
-- [FAQ](https://wiki.servarr.com/sonarr/faq)
-- [Wiki](https://wiki.servarr.com/Sonarr)
-- [API Documentation](https://sonarr.tv/docs/api)
-- [Donate](https://sonarr.tv/donate)
+### Prerequisites
 
-## Support
+- Docker & Docker Compose
+- .NET 6.0 SDK (or later)
+- Node.js & npm (for the web UI)
+- PostgreSQL or SQLite
+- Git
 
-Note: GitHub Issues are for Bugs and Feature Requests Only
+### Installation
 
-- [Forums](https://forums.sonarr.tv/)
-- [Discord](https://discord.gg/M6BvZn5)
-- [GitHub - Bugs and Feature Requests Only](https://github.com/Sonarr/Sonarr/issues)
-- [IRC](https://web.libera.chat/?channels=#sonarr)
-- [Reddit](https://www.reddit.com/r/sonarr)
-- [Wiki](https://wiki.servarr.com/sonarr)
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/<org>/Wrestlarr.git
+   cd Wrestlarr
+   ```
+2. Copy the example configuration and update credentials:
+   ```bash
+   cp appsettings.json.example appsettings.json
+   ```
+3. Launch with Docker Compose:
+   ```bash
+   docker-compose up -d
+   ```
+4. Open your browser to `http://localhost:8081` to access the web UI.
+
+### Running Tests
+
+- **Server tests**:
+  ```bash
+  cd src/Wrestlarr.Server
+  dotnet test
+  ```
+- **UI tests**:
+  ```bash
+  cd src/Wrestlarr.UI
+  npm test
+  ```
 
 ## Features
 
-### Current Features
+- Support for WWE, AEW, NJPW, Impact, ROH and other promotions
+- Automatic detection and download of new events
+- Library scan to identify and fetch missing content
+- Quality upgrade when superior formats are released
+- Integration with SABnzbd, NZBGet, qBittorrent, Transmission
+- Customizable renaming schemes
+- RESTful API for automation and third-party integrations
+- Responsive, mobile-friendly web UI
 
-- Support for major platforms: Windows, Linux, macOS, Raspberry Pi, etc.
-- Automatically detects new episodes
-- Can scan your existing library and download any missing episodes
-- Can watch for better quality of the episodes you already have and do an automatic upgrade. _eg. from DVD to Blu-Ray_
-- Automatic failed download handling will try another release if one fails
-- Manual search so you can pick any release or to see why a release was not downloaded automatically
-- Fully configurable episode renaming
-- Full integration with SABnzbd and NZBGet
-- Full integration with Kodi, Plex (notification, library update, metadata)
-- Full support for specials and multi-episode releases
-- And a beautiful UI
+## Roadmap
+
+- **v0.1 (Alpha)**: Core download, sorting, and rename functionality
+- **v0.2 (Beta)**: Multi-promotion support, UI enhancements, plugin framework
+- **v1.0**: Official stable release, localization, mobile optimizations
+- **v1.x**: Plugin repository, webhooks, authentication, performance tuning
 
 ## Contributing
 
-### Development
+All contributions are welcomed and reviewed according to our [code of conduct](CODE_OF_CONDUCT.md). Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on submitting issues and pull requests.
 
-This project exists thanks to all the people who contribute. [Contribute](CONTRIBUTING.md).
+<a href="https://github.com/<org>/Wrestlarr/graphs/contributors">
+  <img src="https://opencollective.com/Wrestlarr/contributors.svg?width=890&button=false" alt="Contributors" />
+</a>
 
-<a href="https://github.com/Sonarr/Sonarr/graphs/contributors"><img src="https://opencollective.com/Sonarr/contributors.svg?width=890&button=false" /></a>
+## Supporters
 
-### Supporters
+Thank you to our backers and sponsors for making this project possible.
+[Become a sponsor or backer](https://opencollective.com/Wrestlarr) to support ongoing development.
 
-This project would not be possible without the support of our users and software providers.
-[**Become a sponsor or backer**](https://opencollective.com/sonarr) to help us out!
+### Mega Sponsors
 
-#### Mega Sponsors
+[![Mega Sponsors](https://opencollective.com/Wrestlarr/megasponsors/badge.svg)](https://opencollective.com/Wrestlarr/contribute/mega-sponsor/checkout)
 
-[![Sponsors](https://opencollective.com/sonarr/tiers/mega-sponsor.svg?width=890)](https://opencollective.com/sonarr/contribute/mega-sponsor-21443/checkout)
+### Sponsors
 
-#### Sponsors
+[![Sponsors](https://opencollective.com/Wrestlarr/sponsors.svg?width=890)](https://opencollective.com/Wrestlarr/contribute/sponsor/checkout)
 
-[![Flexible Sponsors](https://opencollective.com/sonarr/sponsors.svg?width=890)](https://opencollective.com/sonarr/contribute/sponsor-21457/checkout)
+### Backers
 
-#### Backers
+[![Backers](https://opencollective.com/Wrestlarr/backers/badge.svg)](https://opencollective.com/Wrestlarr/contribute/backer/checkout)
 
-[![Backers](https://opencollective.com/sonarr/backers.svg?width=890)](https://opencollective.com/sonarr/contribute/backer-21442/checkout)
+## License
 
-#### JetBrains
-
-Thank you to [<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.png" alt="JetBrains" width="96">](http://www.jetbrains.com/) for providing us with free licenses to their great tools
-
-[<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/TeamCity.png" alt="TeamCity" width="64">](http://www.jetbrains.com/teamcity/)
-
-[<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/ReSharper.png" alt="ReSharper" width="64">](http://www.jetbrains.com/resharper/)
-
-[<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/dotTrace.png" alt="dotTrace" width="64">](http://www.jetbrains.com/dottrace/)
-
-[<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/Rider.png" alt="Rider" width="64">](http://www.jetbrains.com/rider/)
-
-### Licenses
-
-- [GNU GPL v3](http://www.gnu.org/licenses/gpl.html)
-- Copyright 2010-2025
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
