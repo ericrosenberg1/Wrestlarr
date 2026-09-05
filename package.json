@@ -165,6 +165,7 @@
     "@babel/plugin-transform-modules-systemjs": "^7.29.4",
     "@babel/runtime": "^7.26.10",
     "brace-expansion": "^5.0.8",
+    "browserslist": "^4.28.7",
     "fast-uri": "^3.1.6",
     "flatted": "^3.4.2",
     "glob": "^11.1.0",
