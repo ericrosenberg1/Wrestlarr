@@ -1,11 +1,6 @@
 # <img width="24px" src="./logo.png" alt="Wrestlarr"></img> Wrestlarr
 
-[![Build Status](https://github.com/<org>/Wrestlarr/actions/workflows/ci.yml/badge.svg)](https://github.com/<org>/Wrestlarr/actions)
-[![Coverage Status](https://coveralls.io/repos/github/<org>/Wrestlarr/badge.svg?branch=main)](https://coveralls.io/github/<org>/Wrestlarr?branch=main)
-[![Docker Pulls](https://img.shields.io/docker/pulls/<org>/wrestlarr.svg)](https://hub.docker.com/r/<org>/wrestlarr)
-[![License](https://img.shields.io/github/license/<org>/Wrestlarr.svg)](LICENSE)
-[![Backers on Open Collective](https://opencollective.com/Wrestlarr/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/Wrestlarr/sponsors/badge.svg)](#sponsors)
+[![License](https://img.shields.io/github/license/ericrosenberg1/Wrestlarr.svg)](LICENSE.md)
 
 Wrestlarr is a personal video recorder (PVR) tailored for professional wrestling content. It monitors multiple feeds for new events and episodes, downloads and organizes files, and upgrades quality when better formats become available.
 
@@ -23,7 +18,7 @@ Wrestlarr is a personal video recorder (PVR) tailored for professional wrestling
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/<org>/Wrestlarr.git
+   git clone https://github.com/ericrosenberg1/Wrestlarr.git
    cd Wrestlarr
    ```
 2. Copy the example configuration and update credentials:
@@ -69,29 +64,10 @@ Wrestlarr is a personal video recorder (PVR) tailored for professional wrestling
 
 ## Contributing
 
-All contributions are welcomed and reviewed according to our [code of conduct](CODE_OF_CONDUCT.md). Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on submitting issues and pull requests.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details on submitting issues and pull requests.
 
-<a href="https://github.com/<org>/Wrestlarr/graphs/contributors">
-  <img src="https://opencollective.com/Wrestlarr/contributors.svg?width=890&button=false" alt="Contributors" />
-</a>
-
-## Supporters
-
-Thank you to our backers and sponsors for making this project possible.
-[Become a sponsor or backer](https://opencollective.com/Wrestlarr) to support ongoing development.
-
-### Mega Sponsors
-
-[![Mega Sponsors](https://opencollective.com/Wrestlarr/megasponsors/badge.svg)](https://opencollective.com/Wrestlarr/contribute/mega-sponsor/checkout)
-
-### Sponsors
-
-[![Sponsors](https://opencollective.com/Wrestlarr/sponsors.svg?width=890)](https://opencollective.com/Wrestlarr/contribute/sponsor/checkout)
-
-### Backers
-
-[![Backers](https://opencollective.com/Wrestlarr/backers/badge.svg)](https://opencollective.com/Wrestlarr/contribute/backer/checkout)
+<a href="https://github.com/ericrosenberg1/Wrestlarr/graphs/contributors">Contributors</a>
 
 ## License
 
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
+This project is licensed under the GNU General Public License v3.0. See [LICENSE.md](LICENSE.md) for details.
