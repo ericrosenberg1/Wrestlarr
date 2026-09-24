@@ -12,11 +12,11 @@ namespace NzbDrone.Core.Indexers.Torznab
 {
     public class TorznabSettingsValidator : AbstractValidator<TorznabSettings>
     {
-        private static readonly string[] ApiKeyWhiteList = Array.Empty<string>();
+        private static readonly string[] ApiKeyAllowList = Array.Empty<string>();
 
         private static bool ShouldHaveApiKey(TorznabSettings settings)
         {
-            return settings.BaseUrl != null && ApiKeyWhiteList.Any(c => settings.BaseUrl.ToLowerInvariant().Contains(c));
+            return settings.BaseUrl != null && ApiKeyAllowList.Any(c => settings.BaseUrl.ToLowerInvariant().Contains(c));
         }
 
         private static readonly Regex AdditionalParametersRegex = new(@"(&.+?\=.+?)+", RegexOptions.Compiled);
@@ -60,6 +60,9 @@ namespace NzbDrone.Core.Indexers.Torznab
 
         [FieldDefinition(11, Type = FieldType.Checkbox, Label = "IndexerSettingsRejectBlocklistedTorrentHashes", HelpText = "IndexerSettingsRejectBlocklistedTorrentHashesHelpText", Advanced = true)]
         public bool RejectBlocklistedTorrentHashesWhileGrabbing { get; set; }
+
+        [FieldDefinition(12, Type = FieldType.Checkbox, Label = "IndexerSettingsRejectTorrentFilesWithBlockedExtensions", HelpText = "IndexerSettingsRejectTorrentFilesWithBlockedExtensionsHelpText", Advanced = true)]
+        public bool RejectTorrentFilesWithBlockedExtensionsWhileGrabbing { get; set; }
 
         public override NzbDroneValidationResult Validate()
         {

@@ -8,7 +8,7 @@ window.console.debug = window.console.debug || function() {};
 window.console.warn = window.console.warn || function() {};
 window.console.assert = window.console.assert || function() {};
 
-// TODO: Remove in v5, well suppoprted in browsers
+// TODO: Remove in v5, well supported in browsers
 if (!String.prototype.startsWith) {
   Object.defineProperty(String.prototype, 'startsWith', {
     enumerable: false,
@@ -21,7 +21,7 @@ if (!String.prototype.startsWith) {
   });
 }
 
-// TODO: Remove in v5, well suppoprted in browsers
+// TODO: Remove in v5, well supported in browsers
 if (!String.prototype.endsWith) {
   Object.defineProperty(String.prototype, 'endsWith', {
     enumerable: false,
@@ -47,3 +47,5 @@ if (!('contains' in String.prototype)) {
 if (!Object.groupBy) {
   import('core-js/actual/object/group-by');
 }
+
+import 'core-js/actual/iterator';

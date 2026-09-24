@@ -4,34 +4,21 @@ using NzbDrone.Common.Http;
 
 namespace NzbDrone.Core.ImportLists.Trakt.User
 {
-    public class TraktUserRequestGenerator : IImportListRequestGenerator
+    public class TraktUserRequestGenerator : TraktRequestGeneratorBase<TraktUserSettings>
     {
-        private readonly TraktUserSettings _settings;
-        private readonly string _clientId;
-
-        public TraktUserRequestGenerator(TraktUserSettings settings, string clientId)
+        public TraktUserRequestGenerator(TraktUserSettings settings, string clientId, int pageSize, int maxNumResults)
+            : base(settings, clientId, pageSize, maxNumResults)
         {
-            _settings = settings;
-            _clientId = clientId;
         }
 
-        public virtual ImportListPageableRequestChain GetListItems()
+        protected override void SetResource(HttpRequestBuilder requestBuilder)
         {
-            var pageableRequests = new ImportListPageableRequestChain();
+            var userName = Settings.Username.IsNotNullOrWhiteSpace() ? Settings.Username.Trim() : Settings.AuthUser.Trim();
 
-            pageableRequests.Add(GetSeriesRequest());
-
-            return pageableRequests;
-        }
-
-        private IEnumerable<ImportListRequest> GetSeriesRequest()
-        {
-            var requestBuilder = new HttpRequestBuilder(_settings.BaseUrl.Trim());
-
-            switch (_settings.TraktListType)
+            switch (Settings.TraktListType)
             {
                 case (int)TraktUserListType.UserWatchList:
-                    var watchSorting = _settings.TraktWatchSorting switch
+                    var watchSorting = Settings.TraktWatchSorting switch
                     {
                         (int)TraktUserWatchSorting.Added => "added",
                         (int)TraktUserWatchSorting.Title => "title",
@@ -40,35 +27,33 @@ namespace NzbDrone.Core.ImportLists.Trakt.User
                     };
 
                     requestBuilder
-                        .Resource("/users/{userName}/watchlist/shows/{sorting}")
-                        .SetSegment("sorting", watchSorting);
+                        .Resource("/users/{userName}/watchlist/shows/{watchSorting}")
+                        .SetSegment("userName", userName)
+                        .SetSegment("watchSorting", watchSorting);
                     break;
                 case (int)TraktUserListType.UserWatchedList:
                     requestBuilder
                         .Resource("/users/{userName}/watched/shows")
-                        .AddQueryParam("extended", "full");
+                        .SetSegment("userName", userName);
                     break;
                 case (int)TraktUserListType.UserCollectionList:
-                    requestBuilder.Resource("/users/{userName}/collection/shows");
+                    requestBuilder
+                        .Resource("/users/{userName}/collection/shows")
+                        .SetSegment("userName", userName);
                     break;
             }
+        }
 
-            var userName = _settings.Username.IsNotNullOrWhiteSpace() ? _settings.Username.Trim() : _settings.AuthUser.Trim();
+        protected override Dictionary<string, string> GetFilterParameters()
+        {
+            var filterParams = TraktQueryHelper.BuildFilterParameters(Settings.Rating, Settings.Genres, Settings.Years, _pageSize, Settings.TraktAdditionalParameters);
 
-            requestBuilder
-                .SetSegment("userName", userName)
-                .Accept(HttpAccept.Json)
-                .WithRateLimit(4)
-                .SetHeader("trakt-api-version", "2")
-                .SetHeader("trakt-api-key", _clientId)
-                .AddQueryParam("limit", _settings.Limit.ToString());
-
-            if (_settings.AccessToken.IsNotNullOrWhiteSpace())
+            if (Settings.TraktListType == (int)TraktUserListType.UserWatchedList)
             {
-                requestBuilder.SetHeader("Authorization", $"Bearer {_settings.AccessToken}");
+                filterParams["extended"] = "full";
             }
 
-            yield return new ImportListRequest(requestBuilder.Build());
+            return filterParams;
         }
     }
 }

@@ -1,83 +1,66 @@
 using System.Collections.Generic;
-using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 
 namespace NzbDrone.Core.ImportLists.Trakt.Popular
 {
-    public class TraktPopularRequestGenerator : IImportListRequestGenerator
+    public class TraktPopularRequestGenerator : TraktRequestGeneratorBase<TraktPopularSettings>
     {
-        public TraktPopularSettings Settings { get; set; }
-
-        public string ClientId { get; set; }
-
-        public virtual ImportListPageableRequestChain GetListItems()
+        public TraktPopularRequestGenerator(TraktPopularSettings settings, string clientId, int pageSize, int maxNumResults)
+            : base(settings, clientId, pageSize, maxNumResults)
         {
-            var pageableRequests = new ImportListPageableRequestChain();
-
-            pageableRequests.Add(GetSeriesRequest());
-
-            return pageableRequests;
         }
 
-        private IEnumerable<ImportListRequest> GetSeriesRequest()
+        protected override void SetResource(HttpRequestBuilder requestBuilder)
         {
-            var link = Settings.BaseUrl.Trim();
+            var resource = "/shows";
 
             switch (Settings.TraktListType)
             {
                 case (int)TraktPopularListType.Trending:
-                    link += "/shows/trending";
+                    resource += "/trending";
                     break;
                 case (int)TraktPopularListType.Popular:
-                    link += "/shows/popular";
+                    resource += "/popular";
                     break;
                 case (int)TraktPopularListType.Anticipated:
-                    link += "/shows/anticipated";
+                    resource += "/anticipated";
                     break;
                 case (int)TraktPopularListType.TopWatchedByWeek:
-                    link += "/shows/watched/weekly";
+                    resource += "/watched/weekly";
                     break;
                 case (int)TraktPopularListType.TopWatchedByMonth:
-                    link += "/shows/watched/monthly";
+                    resource += "/watched/monthly";
                     break;
 #pragma warning disable CS0612
                 case (int)TraktPopularListType.TopWatchedByYear:
 #pragma warning restore CS0612
-                    link += "/shows/watched/yearly";
+                    resource += "/watched/yearly";
                     break;
                 case (int)TraktPopularListType.TopWatchedByAllTime:
-                    link += "/shows/watched/all";
+                    resource += "/watched/all";
                     break;
                 case (int)TraktPopularListType.RecommendedByWeek:
-                    link += "/shows/recommended/weekly";
+                    resource += "/recommended/weekly";
                     break;
                 case (int)TraktPopularListType.RecommendedByMonth:
-                    link += "/shows/recommended/monthly";
+                    resource += "/recommended/monthly";
                     break;
 #pragma warning disable CS0612
                 case (int)TraktPopularListType.RecommendedByYear:
 #pragma warning restore CS0612
-                    link += "/shows/recommended/yearly";
+                    resource += "/recommended/yearly";
                     break;
                 case (int)TraktPopularListType.RecommendedByAllTime:
-                    link += "/shows/recommended/all";
+                    resource += "/recommended/all";
                     break;
             }
 
-            var filtersAndLimit = $"?years={Settings.Years}&genres={Settings.Genres?.ToLower()}&ratings={Settings.Rating}&limit={Settings.Limit}{Settings.TraktAdditionalParameters}";
-            link += filtersAndLimit;
+            requestBuilder.Resource(resource);
+        }
 
-            var request = new ImportListRequest(link, HttpAccept.Json);
-
-            request.HttpRequest.Headers.Add("trakt-api-version", "2");
-            request.HttpRequest.Headers.Add("trakt-api-key", ClientId);
-
-            if (Settings.AccessToken.IsNotNullOrWhiteSpace())
-            {
-                request.HttpRequest.Headers.Add("Authorization", "Bearer " + Settings.AccessToken);
-            }
-
-            yield return request;
+        protected override Dictionary<string, string> GetFilterParameters()
+        {
+            return TraktQueryHelper.BuildFilterParameters(Settings.Rating, Settings.Genres, Settings.Years, _pageSize, Settings.TraktAdditionalParameters);
         }
     }
 }

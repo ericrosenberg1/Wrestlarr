@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using NLog;
 using NzbDrone.Common.Extensions;
 using NzbDrone.Common.Http;
 using NzbDrone.Core.Configuration;
 using NzbDrone.Core.Localization;
 using NzbDrone.Core.Parser;
+using NzbDrone.Core.Parser.Model;
 using NzbDrone.Core.Validation;
 
 namespace NzbDrone.Core.ImportLists.Trakt
@@ -15,6 +17,9 @@ namespace NzbDrone.Core.ImportLists.Trakt
     {
         public override ImportListType ListType => ImportListType.Trakt;
         public override TimeSpan MinRefreshInterval => TimeSpan.FromHours(12);
+
+        public override int PageSize => 250;
+        public override TimeSpan RateLimit => TimeSpan.FromSeconds(5);
 
         public const string OAuthUrl = "https://trakt.tv/oauth/authorize";
         public const string RedirectUri = "https://auth.servarr.com/v1/trakt_sonarr/auth";
@@ -45,14 +50,19 @@ namespace NzbDrone.Core.ImportLists.Trakt
                 RefreshToken();
             }
 
-            var generator = GetRequestGenerator();
-
             return FetchItems(g => g.GetListItems(), true);
         }
 
         public override IParseImportListResponse GetParser()
         {
             return new TraktParser();
+        }
+
+        protected override IList<ImportListItemInfo> CleanupListItems(IEnumerable<ImportListItemInfo> releases)
+        {
+            return base.CleanupListItems(releases)
+                .Take(Settings.Limit)
+                .ToList();
         }
 
         public override object RequestAction(string action, IDictionary<string, string> query)
@@ -109,7 +119,7 @@ namespace NzbDrone.Core.ImportLists.Trakt
             }
             catch (HttpException)
             {
-                _logger.Warn($"Error refreshing trakt access token");
+                _logger.Warn("Error retrieving Trakt user settings");
             }
 
             return null;
@@ -125,26 +135,22 @@ namespace NzbDrone.Core.ImportLists.Trakt
                 .AddQueryParam("refresh_token", Settings.RefreshToken)
                 .Build();
 
-            try
+            var response = _httpClient.Get<RefreshRequestResponse>(request);
+
+            if (response?.Resource == null)
             {
-                var response = _httpClient.Get<RefreshRequestResponse>(request);
-
-                if (response != null && response.Resource != null)
-                {
-                    var token = response.Resource;
-                    Settings.AccessToken = token.AccessToken;
-                    Settings.Expires = DateTime.UtcNow.AddSeconds(token.ExpiresIn);
-                    Settings.RefreshToken = token.RefreshToken ?? Settings.RefreshToken;
-
-                    if (Definition.Id > 0)
-                    {
-                        _importListRepository.UpdateSettings((ImportListDefinition)Definition);
-                    }
-                }
+                _logger.Warn("Trakt token refresh returned an empty response");
+                return;
             }
-            catch (HttpException)
+
+            var token = response.Resource;
+            Settings.AccessToken = token.AccessToken;
+            Settings.Expires = DateTime.UtcNow.AddSeconds(token.ExpiresIn);
+            Settings.RefreshToken = token.RefreshToken ?? Settings.RefreshToken;
+
+            if (Definition.Id > 0)
             {
-                _logger.Warn($"Error refreshing trakt access token");
+                _importListRepository.UpdateSettings((ImportListDefinition)Definition);
             }
         }
     }

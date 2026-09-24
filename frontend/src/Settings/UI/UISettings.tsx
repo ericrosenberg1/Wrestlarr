@@ -1,31 +1,34 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment-timezone';
+import React, { useCallback, useMemo } from 'react';
 import Alert from 'Components/Alert';
 import FieldSet from 'Components/FieldSet';
 import Form from 'Components/Form/Form';
 import FormGroup from 'Components/Form/FormGroup';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
+import { EnhancedSelectInputValue } from 'Components/Form/Select/EnhancedSelectInput';
 import LoadingIndicator from 'Components/Loading/LoadingIndicator';
 import PageContent from 'Components/Page/PageContent';
 import PageContentBody from 'Components/Page/PageContentBody';
 import { inputTypes, kinds } from 'Helpers/Props';
+import { useFilteredLanguages } from 'Language/useLanguages';
 import SettingsToolbar from 'Settings/SettingsToolbar';
-import {
-  fetchUISettings,
-  saveUISettings,
-  setUISettingsValue,
-} from 'Store/Actions/settingsActions';
-import createLanguagesSelector from 'Store/Selectors/createLanguagesSelector';
-import createSettingsSectionSelector from 'Store/Selectors/createSettingsSectionSelector';
 import themes from 'Styles/Themes';
 import { InputChanged } from 'typings/inputs';
+import timeZoneOptions from 'Utilities/Date/timeZoneOptions';
 import titleCase from 'Utilities/String/titleCase';
 import translate from 'Utilities/String/translate';
+import { useManageUiSettings } from './useUiSettings';
 
-const SECTION = 'ui';
+const createDateFormatOption = (format: string) => ({
+  key: format,
+  get value() {
+    return moment('2014-03-25').format(format);
+  },
+  hint: format,
+});
 
-export const firstDayOfWeekOptions = [
+export const firstDayOfWeekOptions: EnhancedSelectInputValue<number>[] = [
   {
     key: 0,
     get value() {
@@ -40,72 +43,70 @@ export const firstDayOfWeekOptions = [
   },
 ];
 
-export const weekColumnOptions = [
-  { key: 'ddd M/D', value: 'Tue 3/25', hint: 'ddd M/D' },
-  { key: 'ddd MM/DD', value: 'Tue 03/25', hint: 'ddd MM/DD' },
-  { key: 'ddd D/M', value: 'Tue 25/3', hint: 'ddd D/M' },
-  { key: 'ddd DD/MM', value: 'Tue 25/03', hint: 'ddd DD/MM' },
+export const weekColumnOptions: EnhancedSelectInputValue<string>[] = [
+  createDateFormatOption('ddd M/D'),
+  createDateFormatOption('ddd MM/DD'),
+  createDateFormatOption('ddd D/M'),
+  createDateFormatOption('ddd DD/MM'),
 ];
 
-const shortDateFormatOptions = [
-  { key: 'MMM D YYYY', value: 'Mar 25 2014', hint: 'MMM D YYYY' },
-  { key: 'DD MMM YYYY', value: '25 Mar 2014', hint: 'DD MMM YYYY' },
-  { key: 'MM/D/YYYY', value: '03/25/2014', hint: 'MM/D/YYYY' },
-  { key: 'MM/DD/YYYY', value: '03/25/2014', hint: 'MM/DD/YYYY' },
-  { key: 'DD/MM/YYYY', value: '25/03/2014', hint: 'DD/MM/YYYY' },
-  { key: 'YYYY-MM-DD', value: '2014-03-25', hint: 'YYYY-MM-DD' },
+const shortDateFormatOptions: EnhancedSelectInputValue<string>[] = [
+  createDateFormatOption('MMM D YYYY'),
+  createDateFormatOption('DD MMM YYYY'),
+  createDateFormatOption('MM/D/YYYY'),
+  createDateFormatOption('MM/DD/YYYY'),
+  createDateFormatOption('DD/MM/YYYY'),
+  createDateFormatOption('YYYY-MM-DD'),
 ];
 
-const longDateFormatOptions = [
-  { key: 'dddd, MMMM D YYYY', value: 'Tuesday, March 25, 2014' },
-  { key: 'dddd, D MMMM YYYY', value: 'Tuesday, 25 March, 2014' },
+const longDateFormatOptions: EnhancedSelectInputValue<string>[] = [
+  createDateFormatOption('dddd, MMMM D YYYY'),
+  createDateFormatOption('dddd, D MMMM YYYY'),
 ];
 
-export const timeFormatOptions = [
+export const timeFormatOptions: EnhancedSelectInputValue<string>[] = [
   { key: 'h(:mm)a', value: '5pm/5:30pm' },
   { key: 'HH:mm', value: '17:00/17:30' },
 ];
 
 function UISettings() {
-  const dispatch = useDispatch();
-
   const {
-    items,
+    data: languageItems = [],
     isFetching: isLanguagesFetching,
-    isPopulated: isLanguagesPopulated,
+    isFetched: isLanguagesPopulated,
     error: languagesError,
-  } = useSelector(
-    createLanguagesSelector({
-      Any: true,
-      Original: true,
-      Unknown: true,
-    })
-  );
+  } = useFilteredLanguages({
+    Any: true,
+    Original: true,
+    Unknown: true,
+  });
 
   const {
     isFetching: isSettingsFetching,
-    isPopulated: isSettingsPopulated,
+    isFetched: isSettingsPopulated,
     error: settingsError,
+    hasPendingChanges,
     hasSettings,
     settings,
-    hasPendingChanges,
     isSaving,
     validationErrors,
     validationWarnings,
-  } = useSelector(createSettingsSectionSelector(SECTION));
+    saveSettings,
+    updateSetting,
+  } = useManageUiSettings();
 
   const isFetching = isLanguagesFetching || isSettingsFetching;
   const isPopulated = isLanguagesPopulated && isSettingsPopulated;
   const error = languagesError || settingsError;
 
   const languages = useMemo(() => {
-    return items.map((item) => {
+    return languageItems.map((item) => {
       return {
         key: item.id,
         value: item.name,
       };
     });
-  }, [items]);
+  }, [languageItems]);
 
   const themeOptions = Object.keys(themes).map((theme) => ({
     key: theme,
@@ -114,23 +115,15 @@ function UISettings() {
 
   const handleInputChange = useCallback(
     (change: InputChanged) => {
-      // @ts-expect-error - actions aren't typed
-      dispatch(setUISettingsValue(change));
+      // @ts-expect-error name needs to be keyof UiSettingsModel
+      updateSetting(change.name, change.value);
     },
-    [dispatch]
+    [updateSetting]
   );
+
   const handleSavePress = useCallback(() => {
-    dispatch(saveUISettings());
-  }, [dispatch]);
-
-  useEffect(() => {
-    dispatch(fetchUISettings());
-
-    return () => {
-      // @ts-expect-error - actions aren't typed
-      dispatch(setUISettingsValue({ section: `settings.${SECTION}` }));
-    };
-  }, [dispatch]);
+    saveSettings();
+  }, [saveSettings]);
 
   return (
     <PageContent title={translate('UiSettings')}>
@@ -218,6 +211,18 @@ function UISettings() {
               </FormGroup>
 
               <FormGroup>
+                <FormLabel>{translate('TimeZone')}</FormLabel>
+
+                <FormInputGroup
+                  type={inputTypes.SELECT}
+                  name="timeZone"
+                  values={timeZoneOptions}
+                  onChange={handleInputChange}
+                  {...settings.timeZone}
+                />
+              </FormGroup>
+
+              <FormGroup>
                 <FormLabel>{translate('ShowRelativeDates')}</FormLabel>
                 <FormInputGroup
                   type={inputTypes.CHECK}
@@ -262,6 +267,8 @@ function UISettings() {
                   name="uiLanguage"
                   helpText={translate('UiLanguageHelpText')}
                   helpTextWarning={translate('BrowserReloadRequired')}
+                  includeOriginal={false}
+                  includeUnknown={false}
                   onChange={handleInputChange}
                   {...settings.uiLanguage}
                   errors={

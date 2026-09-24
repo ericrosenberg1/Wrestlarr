@@ -71,6 +71,7 @@ function ProviderFieldFormGroup<T>({
         if (selectOptionsProviderAction) {
           return 'dynamicSelect';
         }
+
         return 'select';
       case 'seriesTag':
         return 'seriesTag';
@@ -120,7 +121,7 @@ function ProviderFieldFormGroup<T>({
         helpTextWarning={helpTextWarning}
         helpLink={helpLink}
         placeholder={placeholder}
-        // @ts-expect-error - this isn;'t available on all types
+        // @ts-expect-error - this isn't available on all types
         selectOptionsProviderAction={selectOptionsProviderAction}
         value={value}
         values={selectValues}

@@ -1,4 +1,4 @@
-import moment, { MomentInput } from 'moment';
+import moment, { MomentInput } from 'moment-timezone';
 import translate from 'Utilities/String/translate';
 import formatTime from './formatTime';
 import isToday from './isToday';
@@ -35,9 +35,11 @@ function formatDateTime(
     return '';
   }
 
-  const relativeDay = getRelativeDay(date, includeRelativeDay);
-  const formattedDate = moment(date).format(dateFormat);
-  const formattedTime = formatTime(date, timeFormat, {
+  const dateTime = moment(date);
+
+  const relativeDay = getRelativeDay(dateTime, includeRelativeDay);
+  const formattedDate = dateTime.format(dateFormat);
+  const formattedTime = formatTime(dateTime, timeFormat, {
     includeMinuteZero: true,
     includeSeconds,
   });
@@ -49,6 +51,7 @@ function formatDateTime(
       formattedTime,
     });
   }
+
   return translate('FormatDateTime', { formattedDate, formattedTime });
 }
 

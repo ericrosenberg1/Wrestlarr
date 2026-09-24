@@ -1,22 +1,23 @@
 import React, { FocusEvent, useCallback, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import * as commandNames from 'Commands/commandNames';
+import CommandNames from 'Commands/CommandNames';
+import { useExecuteCommand } from 'Commands/useCommands';
 import FieldSet from 'Components/FieldSet';
 import FormGroup from 'Components/Form/FormGroup';
 import FormInputButton from 'Components/Form/FormInputButton';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
+import { EnhancedSelectInputValue } from 'Components/Form/Select/EnhancedSelectInput';
 import Icon from 'Components/Icon';
 import ClipboardButton from 'Components/Link/ClipboardButton';
 import ConfirmModal from 'Components/Modal/ConfirmModal';
 import { icons, inputTypes, kinds } from 'Helpers/Props';
-import { executeCommand } from 'Store/Actions/commandActions';
 import { InputChanged } from 'typings/inputs';
 import { PendingSection } from 'typings/pending';
-import General from 'typings/Settings/General';
 import translate from 'Utilities/String/translate';
+import AuthenticationMethodSettings from './AuthenticationMethodSettings';
+import { GeneralSettingsModel } from './useGeneralSettings';
 
-export const authenticationMethodOptions = [
+export const authenticationMethodOptions: EnhancedSelectInputValue<string>[] = [
   {
     key: 'none',
     get value() {
@@ -30,6 +31,12 @@ export const authenticationMethodOptions = [
       return translate('External');
     },
     isHidden: true,
+  },
+  {
+    key: 'oidc',
+    get value() {
+      return translate('Oidc');
+    },
   },
   {
     key: 'basic',
@@ -47,22 +54,29 @@ export const authenticationMethodOptions = [
   },
 ];
 
-export const authenticationRequiredOptions = [
-  {
-    key: 'enabled',
-    get value() {
-      return translate('Enabled');
+export const authenticationRequiredOptions: EnhancedSelectInputValue<string>[] =
+  [
+    {
+      key: 'enabled',
+      get value() {
+        return translate('Enabled');
+      },
     },
-  },
-  {
-    key: 'disabledForLocalAddresses',
-    get value() {
-      return translate('DisabledForLocalAddresses');
+    {
+      key: 'disabledForLocalAddresses',
+      get value() {
+        return translate('DisabledForLocalAddresses');
+      },
     },
-  },
-];
+    {
+      key: 'disabledForLocalHost',
+      get value() {
+        return translate('DisabledForLocalhost');
+      },
+    },
+  ];
 
-const certificateValidationOptions = [
+const certificateValidationOptions: EnhancedSelectInputValue<string>[] = [
   {
     key: 'enabled',
     get value() {
@@ -84,13 +98,19 @@ const certificateValidationOptions = [
 ];
 
 interface SecuritySettingsProps {
-  authenticationMethod: PendingSection<General>['authenticationMethod'];
-  authenticationRequired: PendingSection<General>['authenticationRequired'];
-  username: PendingSection<General>['username'];
-  password: PendingSection<General>['password'];
-  passwordConfirmation: PendingSection<General>['passwordConfirmation'];
-  apiKey: PendingSection<General>['apiKey'];
-  certificateValidation: PendingSection<General>['certificateValidation'];
+  authenticationMethod: PendingSection<GeneralSettingsModel>['authenticationMethod'];
+  authenticationRequired: PendingSection<GeneralSettingsModel>['authenticationRequired'];
+  username: PendingSection<GeneralSettingsModel>['username'];
+  password: PendingSection<GeneralSettingsModel>['password'];
+  passwordConfirmation: PendingSection<GeneralSettingsModel>['passwordConfirmation'];
+  oidcAuthority: PendingSection<GeneralSettingsModel>['oidcAuthority'];
+  oidcClientId: PendingSection<GeneralSettingsModel>['oidcClientId'];
+  oidcClientSecret: PendingSection<GeneralSettingsModel>['oidcClientSecret'];
+  oidcUserIdentifier: PendingSection<GeneralSettingsModel>['oidcUserIdentifier'];
+  oidcScopes: PendingSection<GeneralSettingsModel>['oidcScopes'];
+  apiKey: PendingSection<GeneralSettingsModel>['apiKey'];
+  certificateValidation: PendingSection<GeneralSettingsModel>['certificateValidation'];
+  trustedNetworks: PendingSection<GeneralSettingsModel>['trustedNetworks'];
   isResettingApiKey: boolean;
   onInputChange: (change: InputChanged) => void;
 }
@@ -101,12 +121,18 @@ function SecuritySettings({
   username,
   password,
   passwordConfirmation,
+  oidcAuthority,
+  oidcClientId,
+  oidcClientSecret,
+  oidcUserIdentifier,
+  oidcScopes,
   apiKey,
   certificateValidation,
+  trustedNetworks,
   isResettingApiKey,
   onInputChange,
 }: SecuritySettingsProps) {
-  const dispatch = useDispatch();
+  const executeCommand = useExecuteCommand();
 
   const [isConfirmApiKeyResetModalOpen, setIsConfirmApiKeyResetModalOpen] =
     useState(false);
@@ -125,14 +151,14 @@ function SecuritySettings({
   const handleConfirmResetApiKey = useCallback(() => {
     setIsConfirmApiKeyResetModalOpen(false);
 
-    dispatch(executeCommand({ name: commandNames.RESET_API_KEY }));
-  }, [dispatch]);
+    executeCommand({ name: CommandNames.ResetApiKey });
+  }, [executeCommand]);
 
   const handleCloseResetApiKeyModal = useCallback(() => {
     setIsConfirmApiKeyResetModalOpen(false);
   }, []);
 
-  // createCommandExecutingSelector(commandNames.RESET_API_KEY),
+  // createCommandExecutingSelector(CommandNames.RESET_API_KEY),
 
   const authenticationEnabled =
     authenticationMethod && authenticationMethod.value !== 'none';
@@ -168,44 +194,18 @@ function SecuritySettings({
         </FormGroup>
       ) : null}
 
-      {authenticationEnabled ? (
-        <FormGroup>
-          <FormLabel>{translate('Username')}</FormLabel>
-
-          <FormInputGroup
-            type={inputTypes.TEXT}
-            name="username"
-            onChange={onInputChange}
-            {...username}
-          />
-        </FormGroup>
-      ) : null}
-
-      {authenticationEnabled ? (
-        <FormGroup>
-          <FormLabel>{translate('Password')}</FormLabel>
-
-          <FormInputGroup
-            type={inputTypes.PASSWORD}
-            name="password"
-            onChange={onInputChange}
-            {...password}
-          />
-        </FormGroup>
-      ) : null}
-
-      {authenticationEnabled ? (
-        <FormGroup>
-          <FormLabel>{translate('PasswordConfirmation')}</FormLabel>
-
-          <FormInputGroup
-            type={inputTypes.PASSWORD}
-            name="passwordConfirmation"
-            onChange={onInputChange}
-            {...passwordConfirmation}
-          />
-        </FormGroup>
-      ) : null}
+      <AuthenticationMethodSettings
+        authenticationMethod={authenticationMethod}
+        username={username}
+        password={password}
+        passwordConfirmation={passwordConfirmation}
+        oidcAuthority={oidcAuthority}
+        oidcClientId={oidcClientId}
+        oidcClientSecret={oidcClientSecret}
+        oidcUserIdentifier={oidcUserIdentifier}
+        oidcScopes={oidcScopes}
+        onInputChange={onInputChange}
+      />
 
       <FormGroup>
         <FormLabel>{translate('ApiKey')}</FormLabel>
@@ -246,6 +246,20 @@ function SecuritySettings({
           helpText={translate('CertificateValidationHelpText')}
           onChange={onInputChange}
           {...certificateValidation}
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <FormLabel>{translate('TrustedNetworks')}</FormLabel>
+
+        <FormInputGroup
+          type={inputTypes.TEXT}
+          name="trustedNetworks"
+          helpText={translate('TrustedNetworksHelpText')}
+          helpTextWarning={translate('RestartRequiredHelpTextWarning')}
+          helpLink="https://wiki.servarr.com/sonarr/settings#security"
+          onChange={onInputChange}
+          {...trustedNetworks}
         />
       </FormGroup>
 

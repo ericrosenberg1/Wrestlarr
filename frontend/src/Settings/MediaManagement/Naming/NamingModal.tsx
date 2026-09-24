@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import FieldSet from 'Components/FieldSet';
-import SelectInput from 'Components/Form/SelectInput';
+import SelectInput, { SelectInputOption } from 'Components/Form/SelectInput';
 import TextInput from 'Components/Form/TextInput';
 import Button from 'Components/Link/Button';
 import InlineMarkdown from 'Components/Markdown/InlineMarkdown';
@@ -10,14 +10,22 @@ import ModalContent from 'Components/Modal/ModalContent';
 import ModalFooter from 'Components/Modal/ModalFooter';
 import ModalHeader from 'Components/Modal/ModalHeader';
 import { sizes } from 'Helpers/Props';
-import NamingConfig from 'typings/Settings/NamingConfig';
 import translate from 'Utilities/String/translate';
 import NamingOption from './NamingOption';
 import TokenCase from './TokenCase';
 import TokenSeparator from './TokenSeparator';
+import { NamingSettingsModel } from './useNamingSettings';
 import styles from './NamingModal.css';
 
-const separatorOptions: { key: TokenSeparator; value: string }[] = [
+type SeparatorInputOption = Omit<SelectInputOption, 'key'> & {
+  key: TokenSeparator;
+};
+
+type CaseInputOption = Omit<SelectInputOption, 'key'> & {
+  key: TokenCase;
+};
+
+const separatorOptions: SeparatorInputOption[] = [
   {
     key: ' ',
     get value() {
@@ -44,7 +52,7 @@ const separatorOptions: { key: TokenSeparator; value: string }[] = [
   },
 ];
 
-const caseOptions: { key: TokenCase; value: string }[] = [
+const caseOptions: CaseInputOption[] = [
   {
     key: 'title',
     get value() {
@@ -247,7 +255,11 @@ const mediaInfoTokens = [
 const otherTokens = [
   { token: '{Release Group}', example: 'Rls Grp', footNotes: '1' },
   { token: '{Custom Formats}', example: 'iNTERNAL' },
-  { token: '{Custom Format:FormatName}', example: 'AMZN' },
+  {
+    token: '{Custom Format:FormatName}',
+    example: 'Surround Sound',
+    footNotes: '2',
+  },
 ];
 
 const otherAnimeTokens = [{ token: '{Release Hash}', example: 'ABCDEFGH' }];
@@ -266,7 +278,7 @@ const originalTokens = [
 interface NamingModalProps {
   isOpen: boolean;
   name: keyof Pick<
-    NamingConfig,
+    NamingSettingsModel,
     | 'standardEpisodeFormat'
     | 'dailyEpisodeFormat'
     | 'animeEpisodeFormat'
@@ -629,6 +641,11 @@ function NamingModal(props: NamingModalProps) {
                 <div className={styles.footNote}>
                   <sup className={styles.identifier}>1</sup>
                   <InlineMarkdown data={translate('ReleaseGroupFootNote')} />
+                </div>
+
+                <div className={styles.footNote}>
+                  <sup className={styles.identifier}>2</sup>
+                  <InlineMarkdown data={translate('CustomFormatFootNote')} />
                 </div>
               </FieldSet>
 

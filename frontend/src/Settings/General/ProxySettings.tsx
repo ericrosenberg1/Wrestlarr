@@ -3,21 +3,22 @@ import FieldSet from 'Components/FieldSet';
 import FormGroup from 'Components/Form/FormGroup';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
+import { EnhancedSelectInputValue } from 'Components/Form/Select/EnhancedSelectInput';
 import { inputTypes, sizes } from 'Helpers/Props';
 import { InputChanged } from 'typings/inputs';
 import { PendingSection } from 'typings/pending';
-import General from 'typings/Settings/General';
 import translate from 'Utilities/String/translate';
+import { GeneralSettingsModel } from './useGeneralSettings';
 
 interface ProxySettingsProps {
-  proxyEnabled: PendingSection<General>['proxyEnabled'];
-  proxyType: PendingSection<General>['proxyType'];
-  proxyHostname: PendingSection<General>['proxyHostname'];
-  proxyPort: PendingSection<General>['proxyPort'];
-  proxyUsername: PendingSection<General>['proxyUsername'];
-  proxyPassword: PendingSection<General>['proxyPassword'];
-  proxyBypassFilter: PendingSection<General>['proxyBypassFilter'];
-  proxyBypassLocalAddresses: PendingSection<General>['proxyBypassLocalAddresses'];
+  proxyEnabled: PendingSection<GeneralSettingsModel>['proxyEnabled'];
+  proxyType: PendingSection<GeneralSettingsModel>['proxyType'];
+  proxyHostname: PendingSection<GeneralSettingsModel>['proxyHostname'];
+  proxyPort: PendingSection<GeneralSettingsModel>['proxyPort'];
+  proxyUsername: PendingSection<GeneralSettingsModel>['proxyUsername'];
+  proxyPassword: PendingSection<GeneralSettingsModel>['proxyPassword'];
+  proxyBypassFilter: PendingSection<GeneralSettingsModel>['proxyBypassFilter'];
+  proxyBypassLocalAddresses: PendingSection<GeneralSettingsModel>['proxyBypassLocalAddresses'];
   onInputChange: (change: InputChanged) => void;
 }
 
@@ -32,7 +33,7 @@ function ProxySettings({
   proxyBypassLocalAddresses,
   onInputChange,
 }: ProxySettingsProps) {
-  const proxyTypeOptions = [
+  const proxyTypeOptions: EnhancedSelectInputValue<string>[] = [
     {
       key: 'http',
       value: translate('HttpHttps'),

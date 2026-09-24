@@ -1,19 +1,18 @@
 import classNames from 'classnames';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import React, { useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
-import AppState from 'App/State/AppState';
+import { useQueueItemForEpisode } from 'Activity/Queue/Details/QueueDetailsProvider';
+import { useCalendarOptions } from 'Calendar/calendarOptionsStore';
 import getStatusStyle from 'Calendar/getStatusStyle';
 import Icon from 'Components/Icon';
 import Link from 'Components/Link/Link';
 import EpisodeDetailsModal from 'Episode/EpisodeDetailsModal';
 import episodeEntities from 'Episode/episodeEntities';
 import getFinaleTypeName from 'Episode/getFinaleTypeName';
-import useEpisodeFile from 'EpisodeFile/useEpisodeFile';
+import { useEpisodeFile } from 'EpisodeFile/EpisodeFileProvider';
 import { icons, kinds } from 'Helpers/Props';
-import useSeries from 'Series/useSeries';
-import { createQueueItemSelectorForHook } from 'Store/Selectors/createQueueItemSelector';
-import createUISettingsSelector from 'Store/Selectors/createUISettingsSelector';
+import { useSingleSeries } from 'Series/useSeries';
+import { useUiSettingsValues } from 'Settings/UI/useUiSettings';
 import formatTime from 'Utilities/Date/formatTime';
 import padNumber from 'Utilities/Number/padNumber';
 import translate from 'Utilities/String/translate';
@@ -56,13 +55,11 @@ function CalendarEvent(props: CalendarEventProps) {
     onEventModalOpenToggle,
   } = props;
 
-  const series = useSeries(seriesId);
+  const series = useSingleSeries(seriesId);
   const episodeFile = useEpisodeFile(episodeFileId);
-  const queueItem = useSelector(createQueueItemSelectorForHook(id));
+  const queueItem = useQueueItemForEpisode(id);
 
-  const { timeFormat, enableColorImpairedMode } = useSelector(
-    createUISettingsSelector()
-  );
+  const { timeFormat, enableColorImpairedMode } = useUiSettingsValues();
 
   const {
     showEpisodeInformation,
@@ -70,7 +67,7 @@ function CalendarEvent(props: CalendarEventProps) {
     showSpecialIcon,
     showCutoffUnmetIcon,
     fullColorEvents,
-  } = useSelector((state: AppState) => state.calendar.options);
+  } = useCalendarOptions();
 
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 

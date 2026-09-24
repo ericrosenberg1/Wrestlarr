@@ -116,9 +116,14 @@ namespace NzbDrone.Core.Download.Clients.Flood
                     continue;
                 }
 
+                if (Settings.PostImportTags.All(tag => properties.Tags.Contains(tag)))
+                {
+                    continue;
+                }
+
                 var item = new DownloadClientItem
                 {
-                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, false),
+                    DownloadClientInfo = DownloadClientItemClientInfo.FromDownloadClient(this, Settings.PostImportTags.Any()),
                     DownloadId = torrent.Key,
                     Title = properties.Name,
                     OutputPath = _remotePathMappingService.RemapRemoteToLocal(Settings.Host, new OsPath(properties.Directory)),
@@ -247,7 +252,7 @@ namespace NzbDrone.Core.Download.Clients.Flood
 
             return new DownloadClientInfo
             {
-                IsLocalhost = Settings.Host == "127.0.0.1" || Settings.Host == "::1" || Settings.Host == "localhost",
+                IsLocalhost = Settings.Host.IsLocalhostAddress(),
                 OutputRootFolders = new List<OsPath> { _remotePathMappingService.RemapRemoteToLocal(Settings.Host, new OsPath(destDir)) }
             };
         }

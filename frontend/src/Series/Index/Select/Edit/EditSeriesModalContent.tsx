@@ -1,7 +1,9 @@
 import React, { useCallback, useState } from 'react';
+import { useSelect } from 'App/Select/SelectContext';
 import FormGroup from 'Components/Form/FormGroup';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
+import { EnhancedSelectInputValue } from 'Components/Form/Select/EnhancedSelectInput';
 import Button from 'Components/Link/Button';
 import ModalBody from 'Components/Modal/ModalBody';
 import ModalContent from 'Components/Modal/ModalContent';
@@ -23,15 +25,14 @@ interface SavePayload {
   moveFiles?: boolean;
 }
 
-interface EditSeriesModalContentProps {
-  seriesIds: number[];
+export interface EditSeriesModalContentProps {
   onSavePress(payload: object): void;
   onModalClose(): void;
 }
 
 const NO_CHANGE = 'noChange';
 
-const monitoredOptions = [
+const monitoredOptions: EnhancedSelectInputValue<string>[] = [
   {
     key: NO_CHANGE,
     get value() {
@@ -53,7 +54,7 @@ const monitoredOptions = [
   },
 ];
 
-const seasonFolderOptions = [
+const seasonFolderOptions: EnhancedSelectInputValue<string>[] = [
   {
     key: NO_CHANGE,
     get value() {
@@ -76,7 +77,7 @@ const seasonFolderOptions = [
 ];
 
 function EditSeriesModalContent(props: EditSeriesModalContentProps) {
-  const { seriesIds, onSavePress, onModalClose } = props;
+  const { onSavePress, onModalClose } = props;
 
   const [monitored, setMonitored] = useState(NO_CHANGE);
   const [monitorNewItems, setMonitorNewItems] = useState(NO_CHANGE);
@@ -87,6 +88,7 @@ function EditSeriesModalContent(props: EditSeriesModalContentProps) {
   const [seasonFolder, setSeasonFolder] = useState(NO_CHANGE);
   const [rootFolderPath, setRootFolderPath] = useState(NO_CHANGE);
   const [isConfirmMoveModalOpen, setIsConfirmMoveModalOpen] = useState(false);
+  const { selectedCount } = useSelect();
 
   const save = useCallback(
     (moveFiles: boolean) => {
@@ -191,8 +193,6 @@ function EditSeriesModalContent(props: EditSeriesModalContentProps) {
     setIsConfirmMoveModalOpen(false);
     save(true);
   }, [setIsConfirmMoveModalOpen, save]);
-
-  const selectedCount = seriesIds.length;
 
   return (
     <ModalContent onModalClose={onModalClose}>

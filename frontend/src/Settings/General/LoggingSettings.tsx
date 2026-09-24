@@ -3,14 +3,15 @@ import FieldSet from 'Components/FieldSet';
 import FormGroup from 'Components/Form/FormGroup';
 import FormInputGroup from 'Components/Form/FormInputGroup';
 import FormLabel from 'Components/Form/FormLabel';
-import useShowAdvancedSettings from 'Helpers/Hooks/useShowAdvancedSettings';
+import { EnhancedSelectInputValue } from 'Components/Form/Select/EnhancedSelectInput';
 import { inputTypes } from 'Helpers/Props';
+import { useShowAdvancedSettings } from 'Settings/advancedSettingsStore';
 import { InputChanged } from 'typings/inputs';
 import { PendingSection } from 'typings/pending';
-import General from 'typings/Settings/General';
 import translate from 'Utilities/String/translate';
+import { GeneralSettingsModel } from './useGeneralSettings';
 
-const logLevelOptions = [
+const logLevelOptions: EnhancedSelectInputValue<string>[] = [
   {
     key: 'info',
     get value() {
@@ -32,8 +33,8 @@ const logLevelOptions = [
 ];
 
 interface LoggingSettingsProps {
-  logLevel: PendingSection<General>['logLevel'];
-  logSizeLimit: PendingSection<General>['logSizeLimit'];
+  logLevel: PendingSection<GeneralSettingsModel>['logLevel'];
+  logSizeLimit: PendingSection<GeneralSettingsModel>['logSizeLimit'];
   onInputChange: (change: InputChanged) => void;
 }
 

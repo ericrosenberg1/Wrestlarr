@@ -10,7 +10,7 @@ import translate from 'Utilities/String/translate';
 import styles from './ReleaseSceneIndicator.css';
 
 function formatReleaseNumber(
-  seasonNumber: number | undefined,
+  seasonNumber: number | null | undefined,
   episodeNumbers: number[] | undefined,
   absoluteEpisodeNumbers: number[] | undefined
 ) {
@@ -20,6 +20,7 @@ function formatReleaseNumber(
         episodeNumbers[episodeNumbers.length - 1]
       }`;
     }
+
     return `${seasonNumber}x${episodeNumbers[0]}`;
   }
 
@@ -29,10 +30,11 @@ function formatReleaseNumber(
         absoluteEpisodeNumbers[absoluteEpisodeNumbers.length - 1]
       }`;
     }
+
     return absoluteEpisodeNumbers[0];
   }
 
-  if (seasonNumber !== undefined) {
+  if (seasonNumber != null) {
     return translate('SeasonNumberToken', { seasonNumber });
   }
 
@@ -44,7 +46,7 @@ interface ReleaseSceneIndicatorProps {
   seasonNumber?: number;
   episodeNumbers?: number[];
   absoluteEpisodeNumbers?: number[];
-  sceneSeasonNumber?: number;
+  sceneSeasonNumber?: number | null;
   sceneEpisodeNumbers?: number[];
   sceneAbsoluteEpisodeNumbers?: number[];
   sceneMapping?: {
@@ -125,6 +127,7 @@ function ReleaseSceneIndicator(props: ReleaseSceneIndicatorProps) {
         {translate('ReleaseSceneIndicatorUnknownMessage')}
       </div>
     );
+
     if (sceneOrigin === 'unknown') {
       messages.push(
         <div key="origin">
@@ -146,6 +149,7 @@ function ReleaseSceneIndicator(props: ReleaseSceneIndicatorProps) {
     if (!isMixed && !isUnknown) {
       level = styles.levelNotRequested;
     }
+
     if (mappedNumber) {
       messages.push(
         <div key="not-requested">

@@ -2,10 +2,12 @@
 import React, { SyntheticEvent } from 'react';
 import { InputChanged } from 'typings/inputs';
 import translate from 'Utilities/String/translate';
-import EnhancedSelectInput from './EnhancedSelectInput';
+import EnhancedSelectInput, {
+  EnhancedSelectInputValue,
+} from './EnhancedSelectInput';
 import styles from './UMaskInput.css';
 
-const umaskOptions = [
+const umaskOptions: EnhancedSelectInputValue<string>[] = [
   {
     key: '755',
     get value() {
@@ -53,6 +55,7 @@ function formatPermissions(permissions: number) {
   for (let i = 0; i < 9; i++) {
     const bit = (permissions & (1 << i)) !== 0;
     let digit = bit ? 'xwr'[i % 3] : '-';
+
     if (i === 6 && hasSetUID) {
       digit = bit ? 's' : 'S';
     } else if (i === 3 && hasSetGID) {
@@ -60,6 +63,7 @@ function formatPermissions(permissions: number) {
     } else if (i === 0 && hasSticky) {
       digit = bit ? 't' : 'T';
     }
+
     result = digit + result;
   }
 
